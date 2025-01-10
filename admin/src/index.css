@@ -7,3 +7,7 @@
 *{
   font-family: "Tilt Neon", serif;;
 }
+
+::-webkit-scrollbar{
+  @apply hidden
+}
