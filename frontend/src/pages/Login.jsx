@@ -1,13 +1,52 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useContext, useState } from 'react';
+import { AppContext } from '../context/AppContext';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
   const [state, setState] = useState('Sign Up');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const { backendURL,setToken,token } = useContext(AppContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      
+      if(state === "Sign Up"){
+        const { data } = await axios.post(backendURL + "/api/user/register",{name,email,password})
+        if(data.success){
+          navigate('/');
+          localStorage.setItem('token',data.token);
+          setToken(data.token);
+          setName('');
+          setEmail('');
+          setPassword('');
+        }else{
+          toast.error(data.message);
+        }
+      }else{
+        const { data } = await axios.post(backendURL + "/api/user/login-user",{email,password})
+        if(data.success){
+          navigate('/');
+          localStorage.setItem('token',data.token);
+          setToken(data.token);
+          setEmail('');
+          setPassword('');
+        }else{
+          toast.error(data.message);
+        }
+      }
+      
+    } catch (error) {
+      toast.error(error.message);
+    }
+
   }
 
   return (
