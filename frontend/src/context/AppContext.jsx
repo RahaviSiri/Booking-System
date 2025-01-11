@@ -11,6 +11,7 @@ const AppContextProvider = (props) => {
     const [doctors,setDoctors] = useState([]);
     const [token,setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : false );
     const backendURL = import.meta.env.VITE_BACKEND_URL;
+    const [userData,setUserData] = useState(false)
 
     const getAllDoctors = async () => {
 
@@ -27,9 +28,33 @@ const AppContextProvider = (props) => {
         }
     }
 
+    const getUserData = async () => {
+        try {
+            const { data } = await axios.get(backendURL + "/api/user/get-user", { headers: { token } });
+            // In Axios, the response data is inside the 'data' property, not 'response'
+            if (data.success) {
+                setUserData(data.user);
+            } else {
+                toast.error('User not found');
+            }
+        } catch (error) {
+            toast.error('Error fetching user data');
+            console.error(error);
+        }
+    };
+      
+
     useEffect(() => {
         getAllDoctors();
     },[])
+
+    useEffect(() => {
+        if(token){
+            getUserData();
+        }else{
+            setUserData(false);
+        }
+    },[token])
 
     const value = {
         doctors,
@@ -38,6 +63,9 @@ const AppContextProvider = (props) => {
         getAllDoctors,
         token,
         setToken,
+        getUserData,
+        userData,
+        setUserData
 
     }
 
