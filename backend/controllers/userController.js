@@ -167,6 +167,22 @@ const bookAppointment = async (req, res) => {
     }
 };
 
+// API to get user appointments
+const getUserAppointments = async (req,res) => {
+    try {
+
+        const { userId } = req.body;
+        const appointments = await appointmentModel.find( { userId });
+        // Filter Object: The .find() method requires the argument to be an object, like { userId: value }. Previously, you were passing userId directly, which caused the error.
+        // By using { userId }, you're filtering documents where the userId field matches the provided value.
+
+        res.json({success:true,appointments})
+        
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }   
+}
 
 
-export {registerUser,loginUser,getUserData,updateProfile,bookAppointment}
+
+export {registerUser,loginUser,getUserData,updateProfile,bookAppointment,getUserAppointments}

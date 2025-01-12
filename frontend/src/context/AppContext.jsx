@@ -11,7 +11,8 @@ const AppContextProvider = (props) => {
     const [doctors,setDoctors] = useState([]);
     const [token,setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : false );
     const backendURL = import.meta.env.VITE_BACKEND_URL;
-    const [userData,setUserData] = useState(false)
+    const [userData,setUserData] = useState(false);
+    const [appointmentDoctors,setAppointmentDoctors] = useState([]);
 
     const getAllDoctors = async () => {
 
@@ -43,11 +44,37 @@ const AppContextProvider = (props) => {
             console.error(error);
         }
     };
+
+    const getAppointments = async () => {
+        try {
+            const { data } = await axios.get(backendURL + "/api/user/get-user-appointment", { headers: { token } });
+
+            if(data.success){
+                console.log(data.appointments); 
+                // Extract only the docData from each appointment
+                const allDocData = data.appointments.reverse();
+
+                setAppointmentDoctors(allDocData);
+            }else {
+                toast.error('No Appointments');
+            }
+            
+        } catch (error) {
+            toast.error('Error fetching user data');
+            console.error(error);
+        }
+    }
       
 
     useEffect(() => {
         getAllDoctors();
     },[])
+
+    useEffect(() => {
+        if(token){
+            getAppointments();
+        }
+    },[token])
 
     useEffect(() => {
         if(token){
@@ -66,7 +93,9 @@ const AppContextProvider = (props) => {
         setToken,
         getUserData,
         userData,
-        setUserData
+        setUserData,
+        appointmentDoctors,
+        getAppointments,
 
     }
 

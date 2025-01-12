@@ -9,7 +9,7 @@ import axios from 'axios';
 const DoctorAppointment = () => {
 
   const { docId } = useParams();
-  const { doctors, currencySymbol, getAllDoctors, backendURL, token } = useContext(AppContext);
+  const { doctors, currencySymbol, getAllDoctors, backendURL, token, getAppointments } = useContext(AppContext);
   const [selectedDoctor,setSelectedDoctor] = useState(null);
   const [docSlots,setDocSlots] = useState([]);
   const [slotIndex,setSlotIndex] = useState(0);
@@ -110,6 +110,7 @@ const DoctorAppointment = () => {
       if(data.success){
         toast.success(data.message);
         await getAllDoctors();
+        await getAppointments();
         navigate('/my-appointments');
       }else{
         toast.error(data.message);
