@@ -183,6 +183,31 @@ const getUserAppointments = async (req,res) => {
     }   
 }
 
+// API to cancel user appointments
+const cancelUserAppointments = async (req,res) => {
+    try {
+
+        const { appointmentId,userId } = req.body;
+        const appointmentData = await appointmentModel.findById(appointmentId);
+        if(appointmentData.userId !== userId){
+            return res.json({ success: false, message: "Invalid User" });
+        }
+        await appointmentModel.findByIdAndUpdate(appointmentId, {isCancelled : true});
+
+        // Releasing Doctor slots
+        const {docId,slotDate,slotTime} = appointmentData;
+        const doctorData = await doctorModel.findById(docId);
+        let slots_booked = doctorData.slots_booked;
+        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
+        await doctorModel.findByIdAndUpdate(docId, {slots_booked});
+
+        res.json({success:true,message:"Successfully Deleted"})
+        
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }   
+}
 
 
-export {registerUser,loginUser,getUserData,updateProfile,bookAppointment,getUserAppointments}
+
+export {registerUser,loginUser,getUserData,updateProfile,bookAppointment,getUserAppointments,cancelUserAppointments}
