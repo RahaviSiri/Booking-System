@@ -1,15 +1,36 @@
 import React, { useContext } from 'react'
 import { AppContext } from "../context/AppContext"
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const MyAppointments = () => {
 
-  const { appointmentDoctors } = useContext(AppContext);
+  const { appointmentDoctors,backendURL,token,getAppointments,getAllDoctors } = useContext(AppContext);
 
   const months = [" ","Jan","Feb","Mar","Api","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
   const slotDateFormat = (slotDate) => {
     const dateArray = slotDate.split("_");
     return dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2]
+  }
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      console.log(appointmentId);
+
+      const { data } = await axios.post(backendURL + "/api/user/cancel-user-appointment",{ appointmentId },{headers:{token}});
+
+      if(data.success){
+        toast.success(data.message);
+        getAppointments();
+        getAllDoctors();
+      }else{
+        toast.error(data.message);
+      }
+      
+    } catch (error) {
+      toast.error(error.message);
+    }
   }
 
   return (
@@ -20,6 +41,7 @@ const MyAppointments = () => {
           appointmentDoctors && appointmentDoctors.length > 0 ? 
           (
             appointmentDoctors.map((item,index) => (
+              !item.isCancelled &&
               <div className='grid grid-cols-[1fr,2fr] gap-4 sm:flex sm:gap-6 py-2 border-b' key={index}>
                 <div>
                   <img src={item.docData.image} alt="" className='w-32 bg-indigo-50'/>
@@ -35,7 +57,7 @@ const MyAppointments = () => {
                 <div></div>
                 <div className='flex flex-col gap-2 justify-end'>
                   <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all'>Pay Online</button>
-                  <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all'>Cancel appointment</button>
+                  <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all' onClick={() => cancelAppointment(item._id)}>Cancel appointment</button>
                 </div>
                 
               </div>
