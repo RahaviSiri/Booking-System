@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createContext } from "react";
 import axios from "axios"
 import { toast } from "react-toastify"
+import { useEffect } from "react";
 
 export const AdminContext = createContext();
 
@@ -11,6 +12,7 @@ const AdminContextProvider = (props) => {
     const backend_URL = import.meta.env.VITE_BACKEND_URL
 
     const [doctors,setDoctors] = useState([]);
+    const [appointments,setAppointments] = useState([]);
     // const [availability,setAvailability] = useState([]);
 
     const getAllDoctors = async () => {
@@ -42,6 +44,29 @@ const AdminContextProvider = (props) => {
         }
     }
 
+    const getAllAppointments = async () => {
+
+        try {
+    
+          const { data } = await axios.get(backend_URL + "/api/admin/all-appointments" , {headers:{aToken}});
+    
+          if(data.success){
+            setAppointments(data.appointments)
+          }else{
+            toast.error("Error in Fetching");
+          }
+          
+        } catch (error) {
+          toast.error(error.message);
+        }
+    }
+
+    useEffect(() => {
+        if(aToken){
+            getAllAppointments();
+        }
+    },[aToken])
+
     const value = {
         aToken,
         setAToken,
@@ -50,6 +75,9 @@ const AdminContextProvider = (props) => {
         doctors,
         setDoctors,
         changeAvailability,
+        getAllAppointments,
+        appointments,
+        setAppointments,
         
     }
 
