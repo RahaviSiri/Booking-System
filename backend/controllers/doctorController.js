@@ -110,5 +110,66 @@ const cancelAppointment = async (req, res) => {
     }
 };
 
+// API to get data for doctor dashboard
+const getDataDashBoard = async (req,res) => {
+    try {
+        const { docId } = req.body;
+        const appointments = await appointmentModel.find({docId});
 
-export {changeAvailability,allDoctors,doctorLogin,getAppointments,markCompleted,cancelAppointment}
+        let earnings = 0;
+        appointments.map((item) => {
+            if(item.isCompleted || item.isPaid){
+                earnings += item.fees
+            }
+        });
+
+        let patients = [];
+        appointments.map((item) => {
+            if(!patients.includes(item.userId)){
+                patients.push(item.userId);
+            }
+        })
+
+        const dashData = {
+            earnings,
+            appointments:appointments.length,
+            patients:patients.length,
+            latestAppointment: appointments.reverse().slice(0,5)
+        }
+        res.json({success:true,dashData})
+ 
+    } catch (error) {
+        console.log(error);
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+// API to get doctor details
+const doctorDetails = async (req,res) => {
+    try {
+        const { docId } = req.body;
+        const doctor = await doctorModel.findById(docId).select("-password");
+        res.json({success:true,doctor})
+        
+    } catch (error) {
+        console.log(error);
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+// API to update doctor details
+const updateDetails = async (req,res) => {
+    try {
+
+        const { docId,fees,address,available } = req.body;
+        await doctorModel.findByIdAndUpdate(docId,{fees,address,available});
+        res.json({success:true,message:"Successfully updated"});
+        
+    } catch (error) {
+        console.log(error);
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+
+export {changeAvailability,allDoctors,doctorLogin,getAppointments,markCompleted,cancelAppointment,getDataDashBoard,doctorDetails,updateDetails}

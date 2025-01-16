@@ -84,57 +84,70 @@ const MyAppointments = () => {
       </p>
       <div className="gap-10">
         {appointmentDoctors && appointmentDoctors.length > 0 ? (
-          appointmentDoctors.map(
-            (item, index) =>
-              !item.isCancelled && (
-                <div
-                  className="grid grid-cols-[1fr,2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
-                  key={index}
-                >
-                  <div>
-                    <img
-                      src={item.docData.image}
-                      alt=""
-                      className="w-32 bg-indigo-50"
-                    />
-                  </div>
-                  <div className="flex-1 text-sm text-zinc-600">
-                    <p className="text-neutral-800 text-semibold">
-                      {item.docData.name}
-                    </p>
-                    <p>{item.speciality}</p>
-                    <p className="text-zinc-800 font-semibold mt-1">Address:</p>
-                    <p className="text-xs">{item.docData.address.line1}</p>
-                    <p className="text-xs">{item.docData.address.line2}</p>
-                    <p className="mt-1 text-xs">
-                      <span className="text-zinc-800 font-medium text-sm">
-                        Date & Time:{" "}
-                      </span>
-                      {slotDateFormat(item.slotDate)} | {item.slotTime}
-                    </p>
-                  </div>
-                  <div></div>
-                  <div className="flex flex-col gap-2 justify-end">
+          appointmentDoctors.map((item, index) => (
+            <div
+              className="grid grid-cols-[1fr,2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
+              key={index}
+            >
+              <div>
+                <img
+                  src={item.docData.image}
+                  alt=""
+                  className="w-32 bg-indigo-50"
+                />
+              </div>
+              <div className="flex-1 text-sm text-zinc-600">
+                <p className="text-neutral-800 text-semibold">
+                  {item.docData.name}
+                </p>
+                <p>{item.speciality}</p>
+                <p className="text-zinc-800 font-semibold mt-1">Address:</p>
+                <p className="text-xs">{item.docData.address.line1}</p>
+                <p className="text-xs">{item.docData.address.line2}</p>
+                <p className="mt-1 text-xs">
+                  <span className="text-zinc-800 font-medium text-sm">
+                    Date & Time:{" "}
+                  </span>
+                  {slotDateFormat(item.slotDate)} | {item.slotTime}
+                </p>
+              </div>
+              <div></div>
+              {item.isCompleted ? (
+                <div className="flex flex-col justify-end">
+                  <p className="text-green-500 text-sm p-2 border rounded text-center sm:min-w-48">
+                    Completed
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 justify-end">
+                  {item.isCancelled ? (
+                    ""
+                  ) : (
                     <button
-                      className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all"
+                      className={`text-sm text-center sm:min-w-48 py-2 border rounded ${item.isPaid ? "text-orange-500" :"text-stone-500 hover:bg-primary hover:text-white transition-all" } `}
                       onClick={
                         item.isPaid ? null : () => paymentProceed(item._id)
                       }
                     >
                       {item.isPaid ? "Paid" : "Pay Online"}
                     </button>
-                    {!item.isPaid && (
-                      <button
-                        className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all"
-                        onClick={() => cancelAppointment(item._id)}
-                      >
-                        Cancel appointment
-                      </button>
-                    )}
-                  </div>
+                  )}
+                  {!item.isPaid && (
+                    <button
+                      className={`text-sm text-center sm:min-w-48 py-2 border rounded ${
+                        item.isCancelled
+                          ? "text-red-500"
+                          : "text-stone-500 hover:bg-red-600 hover:text-white transition-all"
+                      } `}
+                      onClick={() => cancelAppointment(item._id)}
+                    >
+                      {item.isCancelled ? "Cancelled " : "Cancel appointment"}
+                    </button>
+                  )}
                 </div>
-              )
-          )
+              )}
+            </div>
+          ))
         ) : (
           <p className="text-center text-gray-500">No appointments found.</p>
         )}

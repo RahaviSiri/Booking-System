@@ -10,6 +10,8 @@ const DoctorContextProvider = (props) => {
     const [dToken,setDToken] = useState(localStorage.getItem('dToken')?localStorage.getItem('dToken'):"");
     const backend_URL = import.meta.env.VITE_BACKEND_URL
     const [appointments,setAppointments] = useState([]);
+    const [dashboardData,setDashboardData] = useState(false);
+    const [doctorProfile,setDoctorProfile] = useState(false);
 
     const getAppointments = async () => {
         try {
@@ -63,6 +65,38 @@ const DoctorContextProvider = (props) => {
         }
     }
 
+    const getDashData = async () => {
+        try {
+
+            const { data } = await axios.get(backend_URL + "/api/doctor/get-data",{headers:{dToken}});
+            if(data.success){
+                setDashboardData(data.dashData);
+            }else{
+                toast.error("Error Fetching");
+            }
+            
+        } catch (error) {
+            console.log(error.message)
+            toast.error(error.message);
+        }
+    }
+
+    const getDoctorProfile = async () => {
+        try {
+
+            const { data } = await axios.get(backend_URL + "/api/doctor/doctor-profile",{headers:{dToken}});
+            if(data.success){
+                setDoctorProfile(data.doctor);
+            }else{
+                toast.error("Error Fetching");
+            }
+            
+        } catch (error) {
+            console.log(error.message)
+            toast.error(error.message);
+        }
+    }
+
     const value = {
         dToken,
         setDToken,
@@ -70,7 +104,12 @@ const DoctorContextProvider = (props) => {
         getAppointments,
         appointments,
         markCompleted,
-        cancelAppointment
+        cancelAppointment,
+        getDashData,
+        dashboardData,
+        getDoctorProfile,
+        doctorProfile,
+        setDoctorProfile,
         
     }
 

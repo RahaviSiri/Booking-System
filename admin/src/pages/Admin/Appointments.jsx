@@ -1,13 +1,14 @@
-import React from 'react';
-import { useContext } from 'react';
-import { AdminContext } from '../../context/adminContext';
-import { AppContext } from '../../context/appContext';
+import React from "react";
+import { useContext } from "react";
+import { AdminContext } from "../../context/adminContext";
+import { AppContext } from "../../context/appContext";
 import { assets } from "../../assets_admin/assets.js";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 const Appointments = () => {
-  const { appointments, getAllAppointments, backend_URL, aToken } = useContext(AdminContext);
+  const { appointments, getAllAppointments, backend_URL, aToken } =
+    useContext(AdminContext);
   const { calculateAge, slotDateFormat, currency } = useContext(AppContext);
 
   const cancelAppointment = async (appointmentId) => {
@@ -49,7 +50,11 @@ const Appointments = () => {
           >
             <p className="max-sm:hidden">{index + 1}</p>
             <div className="flex items-center gap-2">
-              <img src={item.userData.image} alt="" className="w-8 rounded-full" />
+              <img
+                src={item.userData.image}
+                alt=""
+                className="w-8 rounded-full"
+              />
               <p>{item.userData.name}</p>
             </div>
             <p className="max-sm:hidden">{calculateAge(item.userData.dob)}</p>
@@ -57,21 +62,34 @@ const Appointments = () => {
               {slotDateFormat(item.slotDate)} | {item.slotTime}
             </p>
             <div className="flex items-center gap-2">
-              <img src={item.docData.image} alt="" className="w-8 rounded-full bg-gray-200" />
+              <img
+                src={item.docData.image}
+                alt=""
+                className="w-8 rounded-full bg-gray-200"
+              />
               <p>{item.docData.name}</p>
             </div>
-            <p>{currency}{item.fees}</p>
+            <p>
+              {currency}
+              {item.fees}
+            </p>
             {item.isCancelled ? (
               <p className="text-red-400 text-xs font-medium">Cancelled</p>
             ) : (
               <>
                 {!item.isPaid ? (
-                  <img
-                    src={assets.cancel_icon}
-                    alt="Cancel Icon"
-                    className="w-10 cursor-pointer"
-                    onClick={() => cancelAppointment(item._id)}
-                  />
+                  item.isCompleted ? (
+                    <p className="text-green-500 text-xs font-medium">
+                      Completed
+                    </p>
+                  ) : (
+                    <img
+                      src={assets.cancel_icon}
+                      alt="Cancel Icon"
+                      className="w-10 cursor-pointer"
+                      onClick={() => cancelAppointment(item._id)}
+                    />
+                  )
                 ) : (
                   <p className="text-yellow-500 text-xs font-medium">Paid</p>
                 )}
